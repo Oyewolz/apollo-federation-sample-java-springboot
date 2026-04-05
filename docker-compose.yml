@@ -1,0 +1,40 @@
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "9081:8081"
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
+    container_name: booking-service
+    ports:
+      - "9082:8082"
+
+  apollo-router:
+    build:
+      context: .
+      dockerfile: router/Dockerfile
+    container_name: apollo-router
+    working_dir: /workspace
+    depends_on:
+      - user-service
+      - booking-service
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./:/workspace
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        APOLLO_ELV2_LICENSE=accept
+        APOLLO_ROVER_DEV_ROUTER_VERSION=2.1.3
+        APOLLO_ROVER_DEV_COMPOSITION_VERSION=2.11.3
+        npx -y @apollo/rover dev
+        --supergraph-config federation/supergraph-config.yaml
+        --router-config federation/router.yaml

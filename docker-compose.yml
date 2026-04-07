@@ -1,17 +1,17 @@
 services:
-  user-service:
+  author-service:
     build:
       context: .
       dockerfile: user-service/Dockerfile
-    container_name: user-service
+    container_name: author-service
     ports:
       - "9081:8081"
 
-  booking-service:
+  book-service:
     build:
       context: .
       dockerfile: booking-service/Dockerfile
-    container_name: booking-service
+    container_name: book-service
     ports:
       - "9082:8082"
 
@@ -22,8 +22,8 @@ services:
     container_name: apollo-router
     working_dir: /workspace
     depends_on:
-      - user-service
-      - booking-service
+      - author-service
+      - book-service
     ports:
       - "4000:4000"
     volumes:
@@ -38,3 +38,4 @@ services:
         npx -y @apollo/rover dev
         --supergraph-config federation/supergraph-config.yaml
         --router-config federation/router.yaml
+  

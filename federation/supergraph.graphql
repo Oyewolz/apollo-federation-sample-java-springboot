@@ -19,21 +19,34 @@ directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on
 
 directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
 
-type Booking
-  @join__type(graph: BOOKING)
+type Author
+  @join__type(graph: AUTHOR, key: "id")
+  @join__type(graph: BOOK, key: "id")
 {
   id: ID!
-  code: String!
-  status: String!
-  notes: String!
-  user: User!
+  name: String! @join__field(graph: AUTHOR)
+  country: String! @join__field(graph: AUTHOR)
+  era: String! @join__field(graph: AUTHOR)
+  books: [Book!]! @join__field(graph: BOOK)
+  bookCount: Int! @join__field(graph: BOOK)
+}
+
+type Book
+  @join__type(graph: BOOK)
+{
+  id: ID!
+  title: String!
+  genre: String!
+  isbn: String!
+  publishedYear: Int!
+  author: Author!
 }
 
 scalar join__FieldSet
 
 enum join__Graph {
-  BOOKING @join__graph(name: "booking", url: "http://booking-service:8082/graphql")
-  USER @join__graph(name: "user", url: "http://user-service:8081/graphql")
+  AUTHOR @join__graph(name: "author", url: "http://author-service:8081/graphql")
+  BOOK @join__graph(name: "book", url: "http://book-service:8082/graphql")
 }
 
 scalar link__Import
@@ -51,23 +64,11 @@ enum link__Purpose {
 }
 
 type Query
-  @join__type(graph: BOOKING)
-  @join__type(graph: USER)
+  @join__type(graph: AUTHOR)
+  @join__type(graph: BOOK)
 {
-  bookings: [Booking!]! @join__field(graph: BOOKING)
-  bookingById(id: ID!): Booking @join__field(graph: BOOKING)
-  users: [User!]! @join__field(graph: USER)
-  userById(id: ID!): User @join__field(graph: USER)
-}
-
-type User
-  @join__type(graph: BOOKING, key: "id")
-  @join__type(graph: USER, key: "id")
-{
-  id: ID!
-  bookings: [Booking!]! @join__field(graph: BOOKING)
-  activeBookingCount: Int! @join__field(graph: BOOKING)
-  name: String! @join__field(graph: USER)
-  email: String! @join__field(graph: USER)
-  tier: String! @join__field(graph: USER)
+  authors: [Author!]! @join__field(graph: AUTHOR)
+  authorById(id: ID!): Author @join__field(graph: AUTHOR)
+  books: [Book!]! @join__field(graph: BOOK)
+  bookById(id: ID!): Book @join__field(graph: BOOK)
 }
